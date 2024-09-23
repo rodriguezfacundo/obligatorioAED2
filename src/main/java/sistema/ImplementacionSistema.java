@@ -1,6 +1,7 @@
 package sistema;
 
 import dominio.ABB.ABB;
+import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
 import dominio.Grafo.Modelo.Jugador;
 import dominio.Lista.Lista;
@@ -43,7 +44,16 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno buscarJugador(String alias) {
-        return Retorno.noImplementada();
+        if(alias.isBlank() || alias == null) {
+            return Retorno.error1("El alias no puede ser vacio");
+        }
+        Jugador jugadorBuscado = new Jugador(alias,"","",null);
+        ObjectoCantidadAuxiliar resultado = arbolJugadores.buscarDatoMasCantidadRecorridas(jugadorBuscado);
+        if(resultado==null){
+            return Retorno.error2("No existe ese jugador");
+        }
+        Jugador jugadorEncontrado = (Jugador)resultado.getDato();
+        return Retorno.ok(resultado.getCantidad(),jugadorEncontrado.toString());
     }
 
     @Override
