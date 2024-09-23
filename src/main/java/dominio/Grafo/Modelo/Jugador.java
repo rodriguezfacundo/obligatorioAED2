@@ -66,4 +66,9 @@ public class Jugador implements Comparable<Jugador>{
     public int compareTo(Jugador o) {
         return 0;//Veremos con cual dato comparar luego
     }
+
+    @Override
+    public String toString() {
+        return alias + ";" + nombre + ";" + apellido + ";" + categoria;
+    }
 }
