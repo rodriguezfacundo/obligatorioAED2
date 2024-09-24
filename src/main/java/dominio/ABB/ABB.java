@@ -1,5 +1,7 @@
 package dominio.ABB;
 
+import dominio.Grafo.Estructura.ObjetoAuxiliar;
+
 public class ABB<T extends Comparable<T>> implements Comparable {
 
     private Nodo<T> raiz;
@@ -92,6 +94,24 @@ public class ABB<T extends Comparable<T>> implements Comparable {
         return "";
     }
 
+    public ObjetoAuxiliar obtenerDato(T buscado){
+        return obtenerDato(buscado, raiz);
+    }
+    private ObjetoAuxiliar obtenerDato(T buscado , Nodo<T> nodo){
+        if(nodo != null){
+            if(nodo.getDato().equals(buscado)){
+                 return new ObjetoAuxiliar(1,nodo.getDato().toString());
+            } else if (nodo.getDato().compareTo(buscado) > 0) {
+                ObjetoAuxiliar ret= obtenerDato(buscado,nodo.getIzq());
+                ret.setValorInt(ret.getValorInt()+1);
+            } else if (nodo.getDato().compareTo(buscado) < 0 ) {
+                ObjetoAuxiliar ret= obtenerDato(buscado,nodo.getDer());
+                ret.setValorInt(ret.getValorInt()+1);
+                return ret;
+            }
+        }
+        return null;
+    }
     @Override
     public int compareTo(Object o) {
         return 0;

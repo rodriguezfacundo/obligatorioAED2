@@ -4,7 +4,7 @@ public class Nodo<T> {
 
     private T dato;
     private Nodo<T> der;
-    private Nodo<T>izq;
+    private Nodo<T> izq;
 
     public Nodo(T dato) {
         this.dato = dato;
