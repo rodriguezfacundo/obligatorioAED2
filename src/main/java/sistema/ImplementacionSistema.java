@@ -58,12 +58,15 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresAscendente() {
-        return Retorno.noImplementada();
+        return Retorno.ok(arbolJugadores.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno listarJugadoresPorCategoria(Categoria unaCategoria) {
-        return Retorno.noImplementada();
+
+        ABB arbolCategoria = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(unaCategoria.getIndice()).getDato();
+
+        return Retorno.ok(arbolCategoria.recorrerAscendenteLlamada());
     }
 
     @Override
