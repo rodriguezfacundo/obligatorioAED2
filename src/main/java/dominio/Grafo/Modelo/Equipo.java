@@ -1,12 +1,16 @@
 package dominio.Grafo.Modelo;
 
-public class Equipo {
+import dominio.ABB.ABB;
+
+public class Equipo implements Comparable<Equipo> {
     private String nombre;
     private String mangaer;
+    private ABB arbolJugadores;
 
     public Equipo(String nombre, String mangaer) {
         this.nombre = nombre;
         this.mangaer = mangaer;
+        arbolJugadores = new ABB();
     }
 
     public String getNombre() {
@@ -23,5 +27,30 @@ public class Equipo {
 
     public void setMangaer(String mangaer) {
         this.mangaer = mangaer;
+    }
+
+    public ABB getArbolJugadores() {
+        return arbolJugadores;
+    }
+
+    public void setArbolJugadores(ABB arbolJugadores) {
+        this.arbolJugadores = arbolJugadores;
+    }
+
+    protected int getCantidadJugadores(){
+        return this.arbolJugadores.cantNodos();
+    }
+
+    public boolean excedeMaximoJugadores(){
+        return getCantidadJugadores() > 5;
+    }
+
+    @Override
+    public int compareTo(Equipo o) {
+        return this.nombre.compareTo(o.nombre);
+    }
+
+    public void agregarJugador(Jugador jugador) {
+        this.arbolJugadores.agregarDato(jugador);
     }
 }

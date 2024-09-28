@@ -92,6 +92,15 @@ public class ABB<T extends Comparable<T>> implements Comparable {
         return "";
     }
 
+    public int cantNodos() {
+        return cantNodosRec(raiz);
+    }
+
+    private int cantNodosRec(Nodo<T> nodo) {
+        if (nodo == null) return 0;
+        return 1 + cantNodosRec(nodo.getIzq()) + cantNodosRec(nodo.getDer());
+    }
+
     @Override
     public int compareTo(Object o) {
         return 0;

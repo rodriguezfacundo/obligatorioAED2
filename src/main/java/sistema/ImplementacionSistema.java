@@ -1,8 +1,10 @@
 package sistema;
 
 import dominio.ABB.ABB;
+import dominio.ABB.ABBEquipo;
 import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
+import dominio.Grafo.Modelo.Equipo;
 import dominio.Grafo.Modelo.Jugador;
 import dominio.Lista.Lista;
 import interfaz.*;
@@ -10,6 +12,7 @@ import interfaz.*;
 public class ImplementacionSistema implements Sistema {
     private Grafo grafo;
     private ABB arbolJugadores;
+    private ABBEquipo arbolEquipos;
     private Lista ListaArbolesCategoriaJugadores;
 
     @Override
@@ -63,20 +66,51 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresPorCategoria(Categoria unaCategoria) {
-
+        //La letra no hace referencia a retornar error en caso de que unaCategoria venga sin valor o no exista.
         ABB arbolCategoria = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(unaCategoria.getIndice()).getDato();
-
         return Retorno.ok(arbolCategoria.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno registrarEquipo(String nombre, String manager) {
-        return Retorno.noImplementada();
+        if(nombre == null || nombre.isBlank() || manager == null || manager.isBlank()) {
+            return Retorno.error1("Los datos no pueden ser vacios ni nulos");
+        }
+        Equipo nuevoEquipo = new Equipo(nombre, manager);
+        if(arbolEquipos.existeDato(nuevoEquipo)){
+            return Retorno.error2("Ya existe un equipo registrado con ese nombre");
+        }
+        arbolEquipos.agregarDato(nuevoEquipo);
+        return Retorno.ok();
     }
 
     @Override
     public Retorno agregarJugadorAEquipo(String nombreEquipo, String aliasJugador) {
-        return Retorno.noImplementada();
+        if(nombreEquipo == null || nombreEquipo.isBlank() || aliasJugador == null || aliasJugador.isBlank()){
+            return Retorno.error1("Los datos no pueden ser vacios ni nulos");
+        }
+        ObjectoCantidadAuxiliar equipoExiste = arbolEquipos.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
+        if(equipoExiste==null){
+            return Retorno.error2("No existe equipo con ese nombre");
+        }
+        Equipo equipo = (Equipo)equipoExiste.getDato();
+        ObjectoCantidadAuxiliar jugadorExiste = arbolJugadores.buscarDatoMasCantidadRecorridas(new Jugador(aliasJugador,"", "", null));
+        if(jugadorExiste==null){
+            return Retorno.error3("No existe jugador con ese alias");
+        }
+        Jugador jugador = (Jugador)jugadorExiste.getDato();
+        if(equipo.excedeMaximoJugadores()){
+            return Retorno.error4("El equipo ya tiene 5 jugadores");
+        }
+        if(!jugador.esProfesional()){
+            return Retorno.error5("El jugador debe de ser de categoria PROFESIONAL");
+        }
+        if(!this.arbolEquipos.existeJugadorEnAlgunEquipo(jugador)){
+            return Retorno.error6("Ese jugador ya se encuentra en algun equipo.");
+        }
+        equipo.agregarJugador(jugador);
+        return Retorno.ok();
+
     }
 
     @Override
@@ -86,7 +120,7 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarEquiposDescendente() {
-        return Retorno.noImplementada();
+        return Retorno.ok(arbolEquipos.recorrerDescendenteLlamada());
     }
 
     @Override
