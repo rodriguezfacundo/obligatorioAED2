@@ -25,4 +25,6 @@ public class ObjectoCantidadAuxiliar<T> {
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
+
+
 }

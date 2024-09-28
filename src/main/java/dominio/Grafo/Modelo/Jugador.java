@@ -64,11 +64,12 @@ public class Jugador implements Comparable<Jugador>{
 
     @Override
     public int compareTo(Jugador o) {
-        return 0;//Veremos con cual dato comparar luego
+        return this.alias.compareTo(o.getAlias());//Comparando por Alias
     }
 
     @Override
     public String toString() {
-        return alias + ";" + nombre + ";" + apellido + ";" + categoria;
+        return alias+";"+nombre+";"+apellido+";"+categoria;
     }
+
 }
