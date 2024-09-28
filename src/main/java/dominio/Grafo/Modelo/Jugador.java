@@ -49,6 +49,10 @@ public class Jugador implements Comparable<Jugador>{
         this.categoria = categoria;
     }
 
+    public boolean esProfesional(){
+        return this.categoria.equals(Categoria.PROFESIONAL);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
