@@ -3,6 +3,8 @@ package sistema;
 import dominio.ABB.ABB;
 import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
+import dominio.Grafo.Estructura.ObjetoAuxiliar;
+import dominio.Grafo.Modelo.Equipo;
 import dominio.Grafo.Modelo.Jugador;
 import dominio.Lista.Lista;
 import interfaz.*;
@@ -11,6 +13,7 @@ public class ImplementacionSistema implements Sistema {
     private Grafo grafo;
     private ABB arbolJugadores;
     private Lista ListaArbolesCategoriaJugadores;
+    private ABB arbolEquipos;
 
     @Override
     public Retorno inicializarSistema(int maxSucursales) {
@@ -22,6 +25,7 @@ public class ImplementacionSistema implements Sistema {
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
+        arbolEquipos = new ABB();
         grafo = new Grafo(maxSucursales);
         return Retorno.ok();
     }
@@ -58,22 +62,63 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresAscendente() {
-        return Retorno.noImplementada();
+        return Retorno.ok(arbolJugadores.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno listarJugadoresPorCategoria(Categoria unaCategoria) {
-        return Retorno.noImplementada();
+        ABB<Categoria> arbolCategoria = (ABB) ListaArbolesCategoriaJugadores.obtenerElementoPorDato(unaCategoria);
+        return Retorno.ok(arbolCategoria.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno registrarEquipo(String nombre, String manager) {
-        return Retorno.noImplementada();
+
+        if (nombre == null || nombre.isBlank() || manager == null || manager.isBlank()) {
+            return Retorno.error1("El nombre del equipo o el manager no pueden ser nulos o vacíos.");
+        }
+
+        Equipo nuevoEquipo = new Equipo(nombre, manager);
+        if (arbolEquipos.existeDato(nuevoEquipo)) {
+            return Retorno.error2("El equipo ya está registrado.");
+        }
+
+        arbolEquipos.agregarDato(nuevoEquipo);
+
+        return Retorno.ok();
+
     }
 
     @Override
     public Retorno agregarJugadorAEquipo(String nombreEquipo, String aliasJugador) {
-        return Retorno.noImplementada();
+
+        if (nombreEquipo == null || nombreEquipo.isBlank() || aliasJugador == null || aliasJugador.isBlank()) {
+            return Retorno.error1("El nombre del equipo y el alias del jugador no pueden ser nulos o vacíos.");
+        }
+        // Traer el equipo por nombre
+        Equipo equipo = new Equipo(nombreEquipo,"");
+        ObjectoCantidadAuxiliar oj = arbolJugadores.obtenerDato(equipo);
+        equipo = (Equipo)oj.getDato();
+
+        if (equipo == null) {
+            return Retorno.error2("El equipo no existe.");
+        }
+
+        // Buscar el jugador por alias
+        Jugador jugador = equipo.getJugador(aliasJugador);
+        if (jugador == null) {
+            return Retorno.error3("El jugador no existe.");
+        } else if (jugador.getCategoria()==null) {
+            return Retorno.error5("El jugador no tiene categoria profesional");
+        }
+
+        // Agregar el jugador al equipo
+        boolean agregado = equipo.agregarJugador(jugador);
+        if (!agregado) {
+            return Retorno.error4("El equipo ya tiene 5 integrantes.");
+        }
+
+        return Retorno.ok();
     }
 
     @Override

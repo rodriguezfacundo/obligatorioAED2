@@ -94,19 +94,20 @@ public class ABB<T extends Comparable<T>> implements Comparable {
         return "";
     }
 
-    public ObjetoAuxiliar obtenerDato(T buscado){
+    public ObjectoCantidadAuxiliar obtenerDato(T buscado){
         return obtenerDato(buscado, raiz);
     }
-    private ObjetoAuxiliar obtenerDato(T buscado , Nodo<T> nodo){
+    private ObjectoCantidadAuxiliar obtenerDato(T buscado , Nodo<T> nodo){
         if(nodo != null){
             if(nodo.getDato().equals(buscado)){
-                 return new ObjetoAuxiliar(1,nodo.getDato().toString());
+                 return new ObjectoCantidadAuxiliar(nodo.getDato(),1);
             } else if (nodo.getDato().compareTo(buscado) > 0) {
-                ObjetoAuxiliar ret= obtenerDato(buscado,nodo.getIzq());
-                ret.setValorInt(ret.getValorInt()+1);
+                ObjectoCantidadAuxiliar ret= obtenerDato(buscado,nodo.getIzq());
+                ret.setCantidad(ret.getCantidad()+1);
+                return ret;
             } else if (nodo.getDato().compareTo(buscado) < 0 ) {
-                ObjetoAuxiliar ret= obtenerDato(buscado,nodo.getDer());
-                ret.setValorInt(ret.getValorInt()+1);
+                ObjectoCantidadAuxiliar ret= obtenerDato(buscado,nodo.getDer());
+                ret.setCantidad(ret.getCantidad()+1);
                 return ret;
             }
         }
