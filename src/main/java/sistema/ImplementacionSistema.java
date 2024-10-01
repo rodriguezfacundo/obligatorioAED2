@@ -105,7 +105,7 @@ public class ImplementacionSistema implements Sistema {
         if(!jugador.esProfesional()){
             return Retorno.error5("El jugador debe de ser de categoria PROFESIONAL");
         }
-        if(!this.arbolEquipos.existeJugadorEnAlgunEquipo(jugador)){
+        if(this.arbolEquipos.existeJugadorEnAlgunEquipo(jugador)){
             return Retorno.error6("Ese jugador ya se encuentra en algun equipo.");
         }
         equipo.agregarJugador(jugador);
@@ -115,7 +115,18 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresDeEquipo(String nombreEquipo) {
-        return Retorno.noImplementada();
+        if (nombreEquipo == null || nombreEquipo.isBlank()) {
+            return Retorno.error1("El nombre del equipo no puede ser vacío o nulo.");
+        }
+
+        Equipo equipo = arbolEquipos.buscarEquipoPorNombre(nombreEquipo);
+        if (equipo == null) {
+            return Retorno.error2("No existe equipo con ese nombre.");
+        }
+
+        String jugadoresEnEquipo = equipo.listarJugadores();
+
+        return Retorno.ok(jugadoresEnEquipo);
     }
 
     @Override
@@ -125,7 +136,24 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno registrarSucursal(String codigo, String nombre) {
-        return Retorno.noImplementada();
+       /* if (codigo == null || codigo.isBlank() || nombre == null || nombre.isBlank()) {
+            return Retorno.error1("Los datos no pueden ser vacíos ni nulos");
+        }
+
+        // Verificar si ya existe una sucursal con el mismo código
+        ObjectoCantidadAuxiliar sucursal = grafo.buscarVertice(codigo);
+        if (sucursal != null) {
+            return Retorno.error2("Ya existe una sucursal registrada con ese código");
+        }
+
+        // Registrar la nueva sucursal en el grafo
+        boolean exito = grafo.agregarVertice(codigo, nombre);
+        if (!exito) {
+            return Retorno.error3("No se pudo registrar la sucursal");
+        }
+
+        return Retorno.ok();*/
+    return Retorno.noImplementada();
     }
 
     @Override

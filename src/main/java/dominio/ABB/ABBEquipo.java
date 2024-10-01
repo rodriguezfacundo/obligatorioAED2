@@ -24,4 +24,22 @@ public class ABBEquipo extends ABB<Equipo> {
         }
         return buscarJugadorEnEquiposRec(nodo.getIzq(), jugadorABuscar) || buscarJugadorEnEquiposRec(nodo.getDer(), jugadorABuscar);
     }
+    public Equipo buscarEquipoPorNombre(String nombreEquipo) {
+        return buscarEquipoRec(raiz, nombreEquipo);
+    }
+
+    private Equipo buscarEquipoRec(Nodo<Equipo> nodo, String nombreEquipo) {
+        if (nodo == null) {
+            return null;
+        }
+
+        if (nombreEquipo.compareTo(nodo.getDato().getNombre()) == 0) {
+            return nodo.getDato();
+        } else if (nombreEquipo.compareTo(nodo.getDato().getNombre()) > 0) {
+            return buscarEquipoRec(nodo.getDer(), nombreEquipo);
+        } else {
+            return buscarEquipoRec(nodo.getIzq(), nombreEquipo);
+        }
+    }
+
 }

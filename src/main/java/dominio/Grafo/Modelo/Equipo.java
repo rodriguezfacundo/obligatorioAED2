@@ -53,4 +53,12 @@ public class Equipo implements Comparable<Equipo> {
     public void agregarJugador(Jugador jugador) {
         this.arbolJugadores.agregarDato(jugador);
     }
+
+    public String listarJugadores() {
+        if (arbolJugadores == null || arbolJugadores.estaVacio()) {
+        return "";
+        }
+        return arbolJugadores.recorrerAscendenteLlamada();
+    }
+
 }

@@ -4,6 +4,10 @@ public class ABB<T extends Comparable<T>> implements Comparable {
 
     private Nodo<T> raiz;
 
+    public boolean estaVacio() {
+        return raiz == null;
+    }
+
     public boolean existeDato(T dato) {
         return existeRec(raiz, dato);
     }
