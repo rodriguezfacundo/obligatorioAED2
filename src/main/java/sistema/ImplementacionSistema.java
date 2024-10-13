@@ -1,7 +1,6 @@
 package sistema;
 
 import dominio.ABB.ABB;
-import dominio.ABB.ABBEquipo;
 import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
 import dominio.Grafo.Modelo.Equipo;
@@ -12,7 +11,7 @@ import interfaz.*;
 public class ImplementacionSistema implements Sistema {
     private Grafo grafo;
     private ABB arbolJugadores;
-    private ABBEquipo arbolEquipos;
+    private ABB arbolEquipos;
     private Lista ListaArbolesCategoriaJugadores;
 
     @Override
@@ -61,12 +60,14 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresAscendente() {
+        //Revisar bien porque pide en orden O(n)
         return Retorno.ok(arbolJugadores.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno listarJugadoresPorCategoria(Categoria unaCategoria) {
         //La letra no hace referencia a retornar error en caso de que unaCategoria venga sin valor o no exista.
+        //Revisar bien porque pide en orden O(k)
         ABB arbolCategoria = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(unaCategoria.getIndice()).getDato();
         return Retorno.ok(arbolCategoria.recorrerAscendenteLlamada());
     }
@@ -105,7 +106,7 @@ public class ImplementacionSistema implements Sistema {
         if(!jugador.esProfesional()){
             return Retorno.error5("El jugador debe de ser de categoria PROFESIONAL");
         }
-        if(!this.arbolEquipos.existeJugadorEnAlgunEquipo(jugador)){
+        if(jugador.estaEnUnEquipo()){
             return Retorno.error6("Ese jugador ya se encuentra en algun equipo.");
         }
         equipo.agregarJugador(jugador);
@@ -115,11 +116,20 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresDeEquipo(String nombreEquipo) {
-        return Retorno.noImplementada();
+        if (nombreEquipo == null ||nombreEquipo.isBlank()) {
+            return Retorno.error1("Debes ingresar un nombre de equipo");
+        }
+        ObjectoCantidadAuxiliar equipoBuscado = arbolJugadores.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
+        if(equipoBuscado==null){
+            return Retorno.error2("No existe equipo con ese nombre");
+        }
+        Equipo equipo = (Equipo)equipoBuscado.getDato();
+        return Retorno.ok(equipo.getJugadores().recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno listarEquiposDescendente() {
+        //Piden que sea en orden O(n), por lo que entiendo que deberia ser en un tad LISTA.
         return Retorno.ok(arbolEquipos.recorrerDescendenteLlamada());
     }
 

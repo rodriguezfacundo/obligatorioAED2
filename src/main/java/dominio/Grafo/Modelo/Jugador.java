@@ -9,12 +9,15 @@ public class Jugador implements Comparable<Jugador>{
     private String nombre;
     private String apellido;
     private Categoria categoria;
+    private boolean enEquipo;
+
 
     public Jugador(String alias, String nombre, String apellido, Categoria categoria) {
         this.alias = alias;
         this.nombre = nombre;
         this.apellido = apellido;
         this.categoria = categoria;
+        this.enEquipo = false;
     }
 
     public String getAlias() {
@@ -51,6 +54,14 @@ public class Jugador implements Comparable<Jugador>{
 
     public boolean esProfesional(){
         return this.categoria.equals(Categoria.PROFESIONAL);
+    }
+
+    public boolean estaEnUnEquipo(){
+        return this.enEquipo;
+    }
+
+    public void registradoEnEquipo(){
+        this.enEquipo = true;
     }
 
     @Override
