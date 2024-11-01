@@ -28,7 +28,7 @@ public class ABB<T extends Comparable<T>> implements Comparable {
         if (nodo == null) {
             return null;
         } else if (nodo.getDato().equals(dato)) {
-            ObjectoCantidadAuxiliar ret = new ObjectoCantidadAuxiliar(nodo.getDato(),cantidad);
+            ObjectoCantidadAuxiliar ret = new ObjectoCantidadAuxiliar(nodo.getDato(),cantidad+1);
             return ret;
         } else {
             if (dato.compareTo(nodo.getDato()) > 0) {

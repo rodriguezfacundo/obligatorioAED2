@@ -20,6 +20,7 @@ public class ImplementacionSistema implements Sistema {
             return Retorno.error1("Error: Sucursales <= 3");
         }
         arbolJugadores = new ABB();
+        arbolEquipos = new ABB();
         ListaArbolesCategoriaJugadores = new Lista<ABB>(null);
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
@@ -35,7 +36,7 @@ public class ImplementacionSistema implements Sistema {
         }
         Jugador jugadorNuevo = new Jugador(alias,nombre,apellido,categoria);
         if(arbolJugadores.existeDato(jugadorNuevo)){
-            return Retorno.error3("Ya existe ese jugador en el sistema");
+            return Retorno.error2("Ya existe ese jugador en el sistema");
         }else{
             arbolJugadores.agregarDato(jugadorNuevo);
             ABB abb = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(categoria.getIndice()).getDato();
@@ -46,7 +47,7 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno buscarJugador(String alias) {
-        if(alias.isBlank() || alias == null) {
+        if(alias == null || alias.isBlank()) {
             return Retorno.error1("El alias no puede ser vacio");
         }
         Jugador jugadorBuscado = new Jugador(alias,"","",null);
@@ -119,7 +120,7 @@ public class ImplementacionSistema implements Sistema {
         if (nombreEquipo == null ||nombreEquipo.isBlank()) {
             return Retorno.error1("Debes ingresar un nombre de equipo");
         }
-        ObjectoCantidadAuxiliar equipoBuscado = arbolJugadores.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
+        ObjectoCantidadAuxiliar equipoBuscado = arbolEquipos.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
         if(equipoBuscado==null){
             return Retorno.error2("No existe equipo con ese nombre");
         }
