@@ -1,27 +1,39 @@
 package dominio.Grafo.Estructura;
 
 import dominio.Cola.Cola;
+import dominio.Cola.ICola;
+import dominio.Grafo.Modelo.Conexion;
 import dominio.Grafo.Modelo.Sucursal;
-import dominio.Lista.Lista;
-import dominio.Lista.NodoLista;
 
 public class Grafo {
     private int cantidad;
     private int tope;
     private Sucursal[] vertices;
-    private Arista[][] matAdy;
+    private Arista[][] aristas;
+    private final boolean dirigido;
 
-    public Grafo(int cantMaxDeVertices) {
+    public Grafo(int cantMaxDeVertices, boolean esDirigido) {
         cantidad = 0;
         tope = cantMaxDeVertices;
         vertices = new Sucursal[tope];
+        aristas = new Arista[tope][tope];
+        dirigido = esDirigido;
 
-        matAdy = new Arista[tope][tope];
-            for (int i = 0; i < tope; i++) {
-                for (int j = 0; j < tope; j++) {
-                    matAdy[i][j] = new Arista();
+        if (dirigido) {
+            for (int i = 0; i < aristas.length; i++) {
+                for (int j = 0; j < aristas.length; j++) {
+                    aristas[i][j] = new Arista();
                 }
             }
+        } else {
+            for (int i = 0; i < aristas.length; i++) {
+                for (int j = 0; j < aristas.length; j++) {
+                    Arista a = new Arista();
+                    aristas[i][j] = a;
+                    aristas[j][i] = a;
+                }
+            }
+        }
     }
 
     public boolean esLleno() {
@@ -37,19 +49,6 @@ public class Grafo {
         return -1;
     }
 
-    /*public Ciudad obtenerCiudadPorCodigo(String codigo){
-        if(codigo==null) return  null;
-        Ciudad aBuscar = new Ciudad(codigo,"");
-        for (int i = 0; i < tope; i++) {
-            if(vertices[i]!=null){
-                if(vertices[i].equals(aBuscar)){
-                    return vertices[i];
-                }
-            }
-        }
-        return null;
-    }
-    */
     private int obtenerPos(Sucursal sucursal) {
         for (int i = 0; i < tope; i++) {
             if(vertices[i]!=null){
@@ -62,145 +61,124 @@ public class Grafo {
     }
 
     public void agregarSucursal(Sucursal sucursal) {
-        int pos = obtenerPosLibre();
-        if(pos!=-1) {
-            vertices[pos] = sucursal;
-            cantidad++;
+        if(cantidad < tope){
+            int pos = obtenerPosLibre();
+            if(pos!=-1) {
+                vertices[pos] = sucursal;
+                cantidad++;
+            }
         }
     }
     public boolean existeSucursal(Sucursal sucursal) {
         return obtenerPos(sucursal) != -1;
     }
 
-    /*public boolean yaExisteConexon(Ciudad origen, Ciudad destino, Conexion conexion){
+    public boolean yaExisteConexion(Sucursal origen, Sucursal destino, Conexion conexion){
         int posicionOrigen = obtenerPos(origen);
         int posicionDestino = obtenerPos(destino);
-        Arista arista = matAdy[posicionOrigen][posicionDestino];
+        Arista arista = this.aristas[posicionOrigen][posicionDestino];
         if(!arista.isExiste()) return false;
         return arista.getConexiones().existeElementoPorDato(conexion);
     }
 
-    public void agregarConexion(Ciudad origen, Ciudad destino, Conexion conexion) {
+    public void agregarConexion(Sucursal origen, Sucursal destino, Conexion conexion) {
         int posOrigen = obtenerPos(origen);
         int posDestino = obtenerPos(destino);
-            matAdy[posOrigen][posDestino].setExiste(true);
-            matAdy[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+        if(this.dirigido){
+            aristas[posDestino][posOrigen].setExiste(true);
+            aristas[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+        } else{
+            aristas[posOrigen][posDestino].setExiste(true);
+            aristas[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+
+            Conexion conexionInvertida = new Conexion(destino.getCodigo(), origen.getCodigo(), conexion.getLatencia());
+            aristas[posDestino][posOrigen].setExiste(true);
+            aristas[posDestino][posOrigen].getConexiones().agregarInicio(conexionInvertida);
+        }
     }
-    public void actualizarConexion(Ciudad origen, Ciudad destino, Conexion conexion) {
+    public void actualizarConexion(Sucursal origen, Sucursal destino, Conexion conexion) {
         int posOrigen = obtenerPos(origen);
         int posDestino = obtenerPos(destino);
-        matAdy[posOrigen][posDestino].getConexiones().obtenerElementoPorDato(conexion).actualizarse(conexion);
+        aristas[posOrigen][posDestino].getConexiones().obtenerElementoPorDato(conexion).actualizarse(conexion);
+        Conexion conexionInvertida = new Conexion(destino.getCodigo(), origen.getCodigo(), conexion.getLatencia());
+        aristas[posDestino][posOrigen].getConexiones().obtenerElementoPorDato(conexionInvertida).actualizarse(conexionInvertida);
+
     }
 
-    public Lista<Ciudad> consulta10(Ciudad origen, int trasbordos){
-        Lista<Ciudad> resultado = new Lista<>();
-        if (origen==null) return resultado;
-        resultado.agregarOrdenado(origen);
-        if(trasbordos==0) return  resultado;
-        Cola<Tupla> cola = new Cola<>();
-        int inicio= obtenerPos(origen);
+    public void dfs(Sucursal vert) {
+        boolean[] visitados = new boolean[tope];
+        int posV = obtenerPos(vert);
+        dfs(posV, visitados, aristas);
+    }
 
-        boolean[]visitados = new boolean[tope];
-        cola.encolar(new Tupla(origen,0));
-        visitados[inicio]=true;
-        while(!cola.esVacia() ){
-            Tupla tupla = cola.desencolar();
-            int pos = obtenerPos(tupla.getCiudad());
-            for(int j=0;j<tope;j++){
-                if(matAdy[pos][j].isExiste() && !visitados[j] && trasbordos>tupla.getNivel()){
-                    Ciudad aEncolar = vertices[j];
-                    cola.encolar(new Tupla(aEncolar,tupla.getNivel()+1));
-                    visitados[j]=true;
-                    resultado.agregarOrdenado(aEncolar);
+    private void dfs(int posV, boolean[] visitados, Arista[][] aristas) {
+        System.out.print(vertices[posV] + " ");
+        visitados[posV] = true;
+        for (int i = 0; i < aristas.length; i++) {
+            if (aristas[posV][i].isExiste() && !visitados[i]) {
+                dfs(i, visitados, aristas);
+            }
+        }
+        System.out.println();
+    }
+
+    public void bfs(Sucursal vert) {
+        int posV = obtenerPos(vert);
+        boolean[] visitados = new boolean[tope];
+        visitados[posV] = true;
+        ICola<Integer> cola = new Cola<>();
+        cola.encolar(posV);
+        while (!cola.estaVacia()) {
+            int posDesencolada = cola.desencolar();
+            System.out.print(vertices[posDesencolada] + " ");
+            for (int i = 0; i < aristas.length; i++) {
+                if (aristas[posDesencolada][i].isExiste() && !visitados[i]) {
+                    visitados[i] = true;
+                    cola.encolar(i);
                 }
             }
         }
-        return  resultado;
     }
-    public ObjetoAuxiliar consulta11(Ciudad origen, Ciudad destino){
-        ObjetoAuxiliar ret = new ObjetoAuxiliar();
-        int posOrigen = obtenerPos(origen);
-        int posDestino = obtenerPos(destino);
-        Conexion conexionMenorTiempo;
 
-        boolean[] visitsados =new boolean[tope];
-        Ciudad[] anterior =new Ciudad[tope];
-        double[] costos =new double[tope];
-        Conexion[] conexiones= new Conexion[tope];
+    public boolean esPuntoCritico(Sucursal vert) {
+        int posVert = obtenerPos(vert);
+        if (posVert == -1) return false; // Si no existe, no es crítica
 
-        for (int i = 0; i <tope ; i++) {
-            costos[i]=Double.MAX_VALUE;
-        }
+        boolean[] visitadosInicial = new boolean[tope];
+        int nodoInicio = (posVert == 0) ? 1 : 0; // Elegir un nodo de inicio distinto al evaluado
+        dfs(nodoInicio, visitadosInicial, aristas);
 
-        costos[posOrigen]=0;
-
-        for (int i = 0; i < cantidad; i++) {
-            int pos = obtenerVerticeNoVisitadoDeMenoCosto(costos,visitsados);
-            if(pos!=-1){
-                visitsados[pos]=true;
-
-                for (int j = 0; j < tope; j++) {
-                    if(matAdy[pos][j].isExiste()&& !visitsados[j]){
-                        conexionMenorTiempo = getMenorPeso(matAdy[pos][j].getConexiones());
-                        double costoNuevo = costos[pos];
-                        costoNuevo = costoNuevo + (int) conexionMenorTiempo.getTiempo();
-                        if (costoNuevo < costos[j]) {
-                            costos[j] = costoNuevo;
-                            anterior[j] = vertices[pos];
-                            conexiones[j]=conexionMenorTiempo;
-                        }
-
-                    }
-                }
+        // Verificar si todos los nodos son alcanzables
+        for (int i = 0; i < visitadosInicial.length; i++) {
+            if (i != posVert && !visitadosInicial[i]) {
+                return false;
             }
         }
-        if (!visitsados[posDestino]) {
-            ret.setValorString("No existe conexión entre las ciudades");
-            ret.setValorInt(0);
-            return ret;
-        }
 
-        String camino =  "";
-        Ciudad ciudadActual=null;
-        int pos = posDestino;
-        while (anterior[pos] != null) {
-            ciudadActual = vertices[pos];
-            camino = "|" + conexiones[pos].getTipo() + "|" + ciudadActual.toString() + camino;
-            pos=obtenerPos(anterior[pos]);
-        }
-        camino = vertices[posOrigen].toString()+ camino;
-        ret.setValorString(camino);
-        ret.setValorInt((int)costos[posDestino]);
-        return  ret;
-    }
+        // Ejecutar DFS excluyendo el nodo 'vert'
+        boolean[] visitadosExcluyendoVert = new boolean[tope];
+        visitadosExcluyendoVert[posVert] = true; // Marcar 'vert' como visitado para simular su desconexión
+        dfs(nodoInicio, visitadosExcluyendoVert, aristas);
 
-
-    public Conexion getMenorPeso(Lista<Conexion> lista){
-        double minimo = Double.MAX_VALUE;
-        NodoLista<Conexion> aux = lista.getInicio();
-        Conexion retorno =null;
-        while(aux!=null){
-            Conexion conexion = aux.getDato();
-            if(conexion.getTiempo()<minimo){
-                minimo=conexion.getTiempo();
-                retorno=aux.getDato();
+        // Comparar los resultados de ambas ejecuciones de DFS
+        for (int i = 0; i < visitadosInicial.length; i++) {
+            if (visitadosInicial[i] != visitadosExcluyendoVert[i]) {
+                return true; // Si hay diferencias, 'vert' es crítico
             }
-            aux=aux.getSiguiente();
         }
-        return  retorno;
+
+        return false; // Si no hay diferencias, 'vert' no es crítico
     }
 
-    private int obtenerVerticeNoVisitadoDeMenoCosto(double[]costos,boolean[]visitados){
-        int posMin = -1;
-        double min=Double.MAX_VALUE;
+    private boolean hayConexion(int nodo) {
+        // Verifica si el nodo tiene al menos una conexión a otro nodo en la matriz de adyacencia
         for (int i = 0; i < tope; i++) {
-            if(!visitados[i] && costos[i]<min){
-                min=costos[i];
-                posMin=i;
+            if (i != nodo && aristas[nodo][i].isExiste()) {
+                return true; // Si existe una conexión, retorna true
             }
         }
-        return posMin;
-    }*/
+        return false; // Si no se encontró ninguna conexión, retorna false
+    }
 
 
 }

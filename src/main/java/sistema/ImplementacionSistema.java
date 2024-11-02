@@ -3,8 +3,10 @@ package sistema;
 import dominio.ABB.ABB;
 import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
+import dominio.Grafo.Modelo.Conexion;
 import dominio.Grafo.Modelo.Equipo;
 import dominio.Grafo.Modelo.Jugador;
+import dominio.Grafo.Modelo.Sucursal;
 import dominio.Lista.Lista;
 import interfaz.*;
 
@@ -20,11 +22,12 @@ public class ImplementacionSistema implements Sistema {
             return Retorno.error1("Error: Sucursales <= 3");
         }
         arbolJugadores = new ABB();
+        arbolEquipos = new ABB();
         ListaArbolesCategoriaJugadores = new Lista<ABB>(null);
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
         ListaArbolesCategoriaJugadores.agregarInicio( new ABB());
-        grafo = new Grafo(maxSucursales);
+        this.grafo = new Grafo(maxSucursales, false);
         return Retorno.ok();
     }
 
@@ -35,7 +38,7 @@ public class ImplementacionSistema implements Sistema {
         }
         Jugador jugadorNuevo = new Jugador(alias,nombre,apellido,categoria);
         if(arbolJugadores.existeDato(jugadorNuevo)){
-            return Retorno.error3("Ya existe ese jugador en el sistema");
+            return Retorno.error2("Ya existe ese jugador en el sistema");
         }else{
             arbolJugadores.agregarDato(jugadorNuevo);
             ABB abb = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(categoria.getIndice()).getDato();
@@ -46,7 +49,7 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno buscarJugador(String alias) {
-        if(alias.isBlank() || alias == null) {
+        if(alias == null || alias.isBlank()) {
             return Retorno.error1("El alias no puede ser vacio");
         }
         Jugador jugadorBuscado = new Jugador(alias,"","",null);
@@ -60,14 +63,11 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarJugadoresAscendente() {
-        //Revisar bien porque pide en orden O(n)
         return Retorno.ok(arbolJugadores.recorrerAscendenteLlamada());
     }
 
     @Override
     public Retorno listarJugadoresPorCategoria(Categoria unaCategoria) {
-        //La letra no hace referencia a retornar error en caso de que unaCategoria venga sin valor o no exista.
-        //Revisar bien porque pide en orden O(k)
         ABB arbolCategoria = (ABB) ListaArbolesCategoriaJugadores.obtenerPorIndice(unaCategoria.getIndice()).getDato();
         return Retorno.ok(arbolCategoria.recorrerAscendenteLlamada());
     }
@@ -119,7 +119,7 @@ public class ImplementacionSistema implements Sistema {
         if (nombreEquipo == null ||nombreEquipo.isBlank()) {
             return Retorno.error1("Debes ingresar un nombre de equipo");
         }
-        ObjectoCantidadAuxiliar equipoBuscado = arbolJugadores.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
+        ObjectoCantidadAuxiliar equipoBuscado = arbolEquipos.buscarDatoMasCantidadRecorridas(new Equipo(nombreEquipo,""));
         if(equipoBuscado==null){
             return Retorno.error2("No existe equipo con ese nombre");
         }
@@ -129,28 +129,83 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno listarEquiposDescendente() {
-        //Piden que sea en orden O(n), por lo que entiendo que deberia ser en un tad LISTA.
         return Retorno.ok(arbolEquipos.recorrerDescendenteLlamada());
     }
 
     @Override
     public Retorno registrarSucursal(String codigo, String nombre) {
-        return Retorno.noImplementada();
+        if(grafo.esLleno()){
+            return Retorno.error1("Grafo lleno");
+        }
+        if(codigo==null || codigo.isBlank() || nombre==null || nombre.isBlank()){
+            return Retorno.error2("Datos vacios");
+        }
+        Sucursal nueva = new Sucursal(codigo,nombre);
+        if(grafo.existeSucursal(nueva)){
+            return Retorno.error3("Ya existe la sucursal");
+        }
+        grafo.agregarSucursal(nueva);
+        return Retorno.ok();
     }
 
     @Override
     public Retorno registrarConexion(String codigoSucursal1, String codigoSucursal2, int latencia) {
-        return Retorno.noImplementada();
+        if(latencia<0){
+            return Retorno.error1("Latencia < 0");
+        }
+        if(codigoSucursal1==null || codigoSucursal1.isBlank() || codigoSucursal2 ==null || codigoSucursal2.isBlank()){
+            return Retorno.error2("Parametros String o Enum son null");
+        }
+        Sucursal origen = new Sucursal(codigoSucursal1,"");
+        Sucursal destino = new Sucursal(codigoSucursal2,"");
+        if(!grafo.existeSucursal(origen) || !grafo.existeSucursal(destino)){
+            return  Retorno.error3("Una o ambas sucursales no existen");
+        }
+        Conexion nuevaConexion = new Conexion(codigoSucursal1,codigoSucursal2, latencia);
+        if(grafo.yaExisteConexion(origen,destino,nuevaConexion)){
+            return  Retorno.error4("Ya existe la conexion");
+        }
+        grafo.agregarConexion(origen,destino,nuevaConexion);
+        return  Retorno.ok();
     }
 
     @Override
     public Retorno actualizarConexion(String codigoSucursal1, String codigoSucursal2, int latencia) {
-        return Retorno.noImplementada();
+        if(latencia < 0){
+            return Retorno.error1("Latencia < 0");
+        }
+        if(codigoSucursal1==null || codigoSucursal1.isBlank() || codigoSucursal2 ==null || codigoSucursal2.isBlank()){
+            return Retorno.error2("Parametros String o Enum son null");
+        }
+        Sucursal origen = new Sucursal(codigoSucursal1,"");
+        Sucursal destino = new Sucursal(codigoSucursal2,"");
+        if(!grafo.existeSucursal(origen) || !grafo.existeSucursal(destino)){
+            return  Retorno.error3("No existe el origen o destino");
+        }
+        Conexion aActualizar = new Conexion(codigoSucursal1,codigoSucursal2, latencia);
+        if(!grafo.yaExisteConexion(origen,destino,aActualizar)){
+            return  Retorno.error4("No existe la conexion");
+        }
+        grafo.actualizarConexion(origen,destino,aActualizar);
+        return  Retorno.ok();
     }
 
     @Override
     public Retorno analizarSucursal(String codigoSucursal) {
-        return Retorno.noImplementada();
+        if(codigoSucursal == null || codigoSucursal.isBlank()){
+            return Retorno.error1("Codigo vacio");
+        }
+        Sucursal sucursal = new Sucursal(codigoSucursal,"");
+        if(!grafo.existeSucursal(sucursal)){
+            return Retorno.error2("No existe esa sucursal en el grafo");
+        }
+        String valoresString = "";
+        if(grafo.esPuntoCritico(sucursal)){
+            valoresString+= "SI";
+        } else{
+            valoresString+= "NO";
+        }
+        return Retorno.ok(valoresString);
     }
 
     @Override

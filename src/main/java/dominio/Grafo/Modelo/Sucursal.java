@@ -1,5 +1,7 @@
 package dominio.Grafo.Modelo;
 
+import java.util.Objects;
+
 public class Sucursal {
     private String codigo;
     private String nombre;
@@ -23,5 +25,18 @@ public class Sucursal {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sucursal sucursal = (Sucursal) o;
+        return Objects.equals(codigo, sucursal.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(codigo);
     }
 }

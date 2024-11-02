@@ -1,16 +1,16 @@
 package dominio.Grafo.Estructura;
 
 
+import dominio.Grafo.Modelo.Conexion;
 import dominio.Lista.Lista;
 
 public class Arista {
-
     private boolean existe;
-    //private Lista<Conexion> conexiones;
+    private Lista<Conexion> conexiones;
 
     public Arista() {
         this.existe = false;
-        //this.conexiones = new Lista<Conexion>();
+        this.conexiones = new Lista<>();
     }
 
 
@@ -23,11 +23,11 @@ public class Arista {
         this.existe = existe;
     }
 
-    /*public Lista<Conexion> getConexiones() {
+    public Lista<Conexion> getConexiones() {
         return conexiones;
     }
 
     public void setConexiones(Lista<Conexion> conexiones) {
         this.conexiones = conexiones;
-    }*/
+    }
 }
