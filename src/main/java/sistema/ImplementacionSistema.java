@@ -168,7 +168,20 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno analizarSucursal(String codigoSucursal) {
-        return Retorno.noImplementada();
+        if(codigoSucursal == null || codigoSucursal.isBlank()){
+            return Retorno.error1("Codigo vacio");
+        }
+        Sucursal sucursal = new Sucursal(codigoSucursal,"");
+        if(!grafo.existeSucursal(sucursal)){
+            return Retorno.error2("No existe esa sucursal en el grafo");
+        }
+        String valoresString = "";
+        if(grafo.esPuntoCritico(sucursal)){
+            valoresString+= "SI";
+        } else{
+            valoresString+= "NO";
+        }
+        return Retorno.ok(valoresString);
     }
 
     @Override
