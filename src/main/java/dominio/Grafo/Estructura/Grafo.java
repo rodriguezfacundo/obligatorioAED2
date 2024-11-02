@@ -1,27 +1,37 @@
 package dominio.Grafo.Estructura;
 
-import dominio.Cola.Cola;
+import dominio.Grafo.Modelo.Conexion;
 import dominio.Grafo.Modelo.Sucursal;
-import dominio.Lista.Lista;
-import dominio.Lista.NodoLista;
 
 public class Grafo {
     private int cantidad;
     private int tope;
     private Sucursal[] vertices;
-    private Arista[][] matAdy;
+    private Arista[][] aristas;
+    private final boolean dirigido;
 
-    public Grafo(int cantMaxDeVertices) {
+    public Grafo(int cantMaxDeVertices, boolean esDirigido) {
         cantidad = 0;
         tope = cantMaxDeVertices;
         vertices = new Sucursal[tope];
+        aristas = new Arista[tope][tope];
+        dirigido = esDirigido;
 
-        matAdy = new Arista[tope][tope];
-            for (int i = 0; i < tope; i++) {
-                for (int j = 0; j < tope; j++) {
-                    matAdy[i][j] = new Arista();
+        if (dirigido) {
+            for (int i = 0; i < aristas.length; i++) {
+                for (int j = 0; j < aristas.length; j++) {
+                    aristas[i][j] = new Arista();
                 }
             }
+        } else {
+            for (int i = 0; i < aristas.length; i++) {
+                for (int j = 0; j < aristas.length; j++) {
+                    Arista a = new Arista();
+                    aristas[i][j] = a;
+                    aristas[j][i] = a;
+                }
+            }
+        }
     }
 
     public boolean esLleno() {
@@ -62,38 +72,48 @@ public class Grafo {
     }
 
     public void agregarSucursal(Sucursal sucursal) {
-        int pos = obtenerPosLibre();
-        if(pos!=-1) {
-            vertices[pos] = sucursal;
-            cantidad++;
+        if(cantidad < tope){
+            int pos = obtenerPosLibre();
+            if(pos!=-1) {
+                vertices[pos] = sucursal;
+                cantidad++;
+            }
         }
     }
     public boolean existeSucursal(Sucursal sucursal) {
         return obtenerPos(sucursal) != -1;
     }
 
-    /*public boolean yaExisteConexon(Ciudad origen, Ciudad destino, Conexion conexion){
+    public boolean yaExisteConexion(Sucursal origen, Sucursal destino, Conexion conexion){
         int posicionOrigen = obtenerPos(origen);
         int posicionDestino = obtenerPos(destino);
-        Arista arista = matAdy[posicionOrigen][posicionDestino];
+        Arista arista = this.aristas[posicionOrigen][posicionDestino];
         if(!arista.isExiste()) return false;
         return arista.getConexiones().existeElementoPorDato(conexion);
     }
 
-    public void agregarConexion(Ciudad origen, Ciudad destino, Conexion conexion) {
+    public void agregarConexion(Sucursal origen, Sucursal destino, Conexion conexion) {
         int posOrigen = obtenerPos(origen);
         int posDestino = obtenerPos(destino);
-            matAdy[posOrigen][posDestino].setExiste(true);
-            matAdy[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+        if(this.dirigido){
+            aristas[posDestino][posOrigen].setExiste(true);
+            aristas[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+        } else{
+            aristas[posOrigen][posDestino].setExiste(true);
+            aristas[posDestino][posOrigen].setExiste(true);
+            aristas[posOrigen][posDestino].getConexiones().agregarInicio(conexion);
+            Conexion conexionInvertida = new Conexion(destino.getCodigo(), origen.getCodigo(), conexion.getLatencia());
+            aristas[posDestino][posOrigen].getConexiones().agregarInicio(conexionInvertida);
+        }
     }
-    public void actualizarConexion(Ciudad origen, Ciudad destino, Conexion conexion) {
+    public void actualizarConexion(Sucursal origen, Sucursal destino, Conexion conexion) {
         int posOrigen = obtenerPos(origen);
         int posDestino = obtenerPos(destino);
-        matAdy[posOrigen][posDestino].getConexiones().obtenerElementoPorDato(conexion).actualizarse(conexion);
+        aristas[posOrigen][posDestino].getConexiones().obtenerElementoPorDato(conexion).actualizarse(conexion);
     }
 
-    public Lista<Ciudad> consulta10(Ciudad origen, int trasbordos){
-        Lista<Ciudad> resultado = new Lista<>();
+    /*public Lista<Sucursal> consulta10(Sucursal origen, int trasbordos){
+        Lista<Sucursal> resultado = new Lista<>();
         if (origen==null) return resultado;
         resultado.agregarOrdenado(origen);
         if(trasbordos==0) return  resultado;
