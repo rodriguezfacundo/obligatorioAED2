@@ -1,36 +1,48 @@
 package dominio.Cola;
 
-import dominio.Lista.NodoLista;
+public class Cola<T> implements ICola<T> {
 
-public class Cola<T> {
+    private NodoCola<T> inicio;
+    private NodoCola<T> fin;
+    private int largo;
 
-    private NodoLista<T> primero;
-    private NodoLista<T> ultimo;
-
-    public Cola() {
-    }
-
-    public void encolar(T dato){
-        NodoLista<T> nuevo = new NodoLista<>(dato);
-        if(esVacia()){
-            primero=nuevo;
-        }else {
-            ultimo.setSiguiente(nuevo);
+    public void encolar(T dato) {
+        if (this.inicio == null) {
+            inicio = new NodoCola<>(dato);
+            fin = inicio;
+        } else {
+            fin.sig = new NodoCola<>(dato);
+            fin = fin.sig;
         }
-        ultimo = nuevo;
+        this.largo++;
     }
-    public T desencolar(){
-        if(esVacia()) return null;
-        T aux = primero.getDato();
-        primero=primero.getSiguiente();
-        if(primero==null){
-            ultimo=null;
+
+    // Pre: !esVacia()
+    public T desencolar() {
+        T dato = this.inicio.dato;
+        inicio = inicio.sig;
+        this.largo--;
+        if (this.inicio == null) {
+            fin = null;
         }
-        return  aux;
+        return dato;
     }
 
-    public boolean esVacia(){
-        return primero==null;
+    public boolean estaVacia() {
+        return this.largo == 0;
     }
 
+    private class NodoCola<Q> {
+        private final Q dato;
+        private NodoCola<Q> sig;
+
+        public NodoCola(Q dato) {
+            this.dato = dato;
+        }
+
+        @Override
+        public String toString() {
+            return dato.toString();
+        }
+    }
 }
