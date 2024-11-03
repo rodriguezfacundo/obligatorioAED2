@@ -2,6 +2,8 @@ package dominio.Grafo.Modelo;
 
 import dominio.ABB.ABB;
 
+import java.util.Objects;
+
 public class Equipo implements Comparable<Equipo> {
     private String nombre;
     private String mangaer;
@@ -42,7 +44,7 @@ public class Equipo implements Comparable<Equipo> {
     }
 
     public boolean excedeMaximoJugadores(){
-        return getCantidadJugadores() > 5;
+        return getCantidadJugadores() >= 5;
     }
     @Override
     public int compareTo(Equipo o) {
@@ -54,11 +56,21 @@ public class Equipo implements Comparable<Equipo> {
         jugador.registradoEnEquipo();
     }
 
-    public String listarJugadores() {
-        if (arbolJugadores == null || arbolJugadores.estaVacio()) {
-        return "";
-        }
-        return arbolJugadores.recorrerAscendenteLlamada();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Equipo equipo = (Equipo) o;
+        return Objects.equals(nombre, equipo.nombre);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(nombre);
+    }
+
+    @Override
+    public String toString() {
+        return this.nombre + ";" + this.mangaer + ";" + this.jugadores.cantNodos();
+    }
 }
