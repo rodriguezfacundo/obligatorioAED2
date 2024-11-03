@@ -1,6 +1,5 @@
 package sistema;
 
-import dominio.Grafo.Modelo.Jugador;
 import interfaz.Categoria;
 import interfaz.Sistema;
 import org.junit.jupiter.api.BeforeEach;

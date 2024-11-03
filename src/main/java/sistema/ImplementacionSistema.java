@@ -1,10 +1,10 @@
 package sistema;
 
-import dominio.ABB.ABB;
-import dominio.ABB.ObjectoCantidadAuxiliar;
-import dominio.Grafo.Estructura.Grafo;
-import dominio.Grafo.Modelo.*;
-import dominio.Lista.Lista;
+import dominio.Auxiliares.ObjectoCantidadAuxiliar;
+import dominio.Entidades.*;
+import dominio.Tads.ABB;
+import dominio.Tads.Grafo;
+import dominio.Tads.Lista;
 import interfaz.*;
 
 public class ImplementacionSistema implements Sistema {

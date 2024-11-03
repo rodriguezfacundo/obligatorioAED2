@@ -1,4 +1,4 @@
-package dominio.Grafo.Estructura;
+package dominio.Auxiliares;
 
 public class ObjetoAuxiliar {
     private long valorInt;

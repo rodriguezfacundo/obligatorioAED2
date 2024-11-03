@@ -1,4 +1,4 @@
-package dominio.Grafo.Modelo;
+package dominio.Entidades;
 
 import interfaz.Categoria;
 

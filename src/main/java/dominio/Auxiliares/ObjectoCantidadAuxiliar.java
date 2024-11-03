@@ -1,4 +1,4 @@
-package dominio.ABB;
+package dominio.Auxiliares;
 
 public class ObjectoCantidadAuxiliar<T> {
 

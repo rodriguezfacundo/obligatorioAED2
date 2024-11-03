@@ -1,6 +1,6 @@
-package dominio.Grafo.Modelo;
+package dominio.Entidades;
 
-import dominio.ABB.ABB;
+import dominio.Tads.ABB;
 
 import java.util.Objects;
 
