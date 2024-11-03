@@ -12,7 +12,7 @@ public class Test14_SucursalesTorneo {
 
     @BeforeEach
     public void setUp() {
-        s.inicializarSistema(100);
+        s.inicializarSistema(30);
 
         s.registrarSucursal(copiarTexto("I"), "Sucursal I");
 

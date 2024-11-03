@@ -3,10 +3,7 @@ package sistema;
 import dominio.ABB.ABB;
 import dominio.ABB.ObjectoCantidadAuxiliar;
 import dominio.Grafo.Estructura.Grafo;
-import dominio.Grafo.Modelo.Conexion;
-import dominio.Grafo.Modelo.Equipo;
-import dominio.Grafo.Modelo.Jugador;
-import dominio.Grafo.Modelo.Sucursal;
+import dominio.Grafo.Modelo.*;
 import dominio.Lista.Lista;
 import interfaz.*;
 
@@ -210,6 +207,17 @@ public class ImplementacionSistema implements Sistema {
 
     @Override
     public Retorno sucursalesParaTorneo(String codigoSucursalAnfitriona, int latenciaLimite) {
-        return Retorno.noImplementada();
+        if(codigoSucursalAnfitriona == null || codigoSucursalAnfitriona.isBlank()){
+            return Retorno.error1("Codigo vacio");
+        }
+        Sucursal sucursal = new Sucursal(codigoSucursalAnfitriona,"");
+        if(!grafo.existeSucursal(sucursal)){
+            return Retorno.error2("No existe esa sucursal en el grafo");
+        }
+        if(latenciaLimite<=0){
+            return Retorno.error3("Latencia Limite <= 0");
+        }
+        ResultadoTorneo resultado = grafo.sucursalesParaTorneo(codigoSucursalAnfitriona, latenciaLimite);
+        return Retorno.ok(resultado.getLatenciaMaxima(), resultado.getResultadoTorneo());
     }
 }
