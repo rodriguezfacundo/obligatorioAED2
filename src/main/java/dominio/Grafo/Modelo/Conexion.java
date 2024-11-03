@@ -3,7 +3,7 @@ package dominio.Grafo.Modelo;
 
 import java.util.Objects;
 
-public class Conexion implements Comparable {
+public class Conexion implements Comparable<Conexion> {
     private String codigoSucursalOrigen;
     private String codigoSucursalDestino;
     private int latencia;
@@ -18,11 +18,6 @@ public class Conexion implements Comparable {
         this.codigoSucursalOrigen=actualizada.getCodigoSucursalOrigen();
         this.codigoSucursalDestino=actualizada.getCodigoSucursalDestino();
         this.latencia = actualizada.getLatencia();
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        return 0;
     }
 
     public String getCodigoSucursalOrigen() {
@@ -60,5 +55,10 @@ public class Conexion implements Comparable {
     @Override
     public int hashCode() {
         return Objects.hash(codigoSucursalOrigen, codigoSucursalDestino);
+    }
+
+    @Override
+    public int compareTo(Conexion o) {
+        return 0;
     }
 }

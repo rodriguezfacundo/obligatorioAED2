@@ -2,7 +2,7 @@ package dominio.Grafo.Modelo;
 
 import java.util.Objects;
 
-public class Sucursal {
+public class Sucursal implements Comparable<Sucursal> {
     private String codigo;
     private String nombre;
 
@@ -38,5 +38,10 @@ public class Sucursal {
     @Override
     public int hashCode() {
         return Objects.hashCode(codigo);
+    }
+
+    @Override
+    public int compareTo(Sucursal o) {
+        return this.codigo.compareTo(o.getCodigo());
     }
 }
