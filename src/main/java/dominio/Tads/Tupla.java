@@ -1,6 +1,6 @@
-package dominio.Grafo.Estructura;
+package dominio.Tads;
 
-import dominio.Grafo.Modelo.Sucursal;
+import dominio.Entidades.Sucursal;
 
 public class Tupla  {
     private Sucursal sucursal;

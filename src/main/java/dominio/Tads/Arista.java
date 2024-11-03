@@ -1,8 +1,7 @@
-package dominio.Grafo.Estructura;
+package dominio.Tads;
 
 
-import dominio.Grafo.Modelo.Conexion;
-import dominio.Lista.Lista;
+import dominio.Entidades.Conexion;
 
 public class Arista {
     private boolean existe;

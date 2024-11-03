@@ -1,4 +1,4 @@
-package dominio.Lista;
+package dominio.Tads;
 
 public class NodoLista<T>  {
 
